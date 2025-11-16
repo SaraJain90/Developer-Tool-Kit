@@ -1,0 +1,106 @@
+#!/bin/bash
+# =========================================
+#  Script Name : todo.sh
+#  Description : Simple To-Do List Manager
+#  Author      : Mukul Aggarwal
+# =========================================
+
+TODO_DIR=".todo"
+TODO_FILE="$TODO_DIR/todo.db"
+
+
+ensure_initialized() {
+    if [[ ! -d "$TODO_DIR" ]]; then
+        echo "Error: Todo is not initialized. Run: todo init"
+        exit 1
+    fi
+}
+
+
+cmd_init() {
+    if [[ -d "$TODO_DIR" ]]; then
+        echo ".todo already exists!"
+        exit 0
+    fi
+
+    mkdir "$TODO_DIR"
+    touch "$TODO_FILE"
+
+    echo "Initialized .todo directory"
+}
+
+
+cmd_add() {
+    ensure_initialized
+
+    message="$1"
+    seq=$(( $(wc -l < "$TODO_FILE") + 1 ))
+
+    echo "$seq|$message|pending" >> "$TODO_FILE"
+
+    echo "Added task #$seq"
+}
+
+
+cmd_display() {
+    ensure_initialized
+
+    printf "%-10s %-50s %-10s\n" "SEQ" "TASK" "STATUS"
+    printf "%-10s %-50s %-10s\n" "----------" "--------------------------------------------------" "----------"
+
+    while IFS='|' read -r seq msg status; do
+        printf "%-10s %-50s %-10s\n" "$seq" "$msg" "$status"
+    done < "$TODO_FILE"
+}
+
+
+cmd_done() {
+    ensure_initialized
+
+    seq="$1"
+
+    if ! grep -q "^$seq|" "$TODO_FILE"; then
+        echo "No todo found with sequence: $seq"
+        exit 1
+    fi
+
+
+    awk -F"|" -v target="$seq" 'BEGIN{OFS=FS} {
+        if ($1 == target) $3="done";
+        print
+    }' "$TODO_FILE" > "$TODO_DIR/tmp.db"
+
+    mv "$TODO_DIR/tmp.db" "$TODO_FILE"
+
+    echo "Marked task #$seq as done"
+}
+
+case "$1" in
+    init)
+        cmd_init
+        ;;
+
+    display)
+        cmd_display
+        ;;
+
+    done)
+        if [[ -z "${2:-}" ]]; then
+            echo "Usage: todo done <sequence>"
+            exit 1
+        fi
+        cmd_done "$2"
+        ;;
+
+    *)
+        if [[ -z "$1" ]]; then
+            echo "Usage:"
+            echo "  todo init"
+            echo "  todo \"task message\""
+            echo "  todo display"
+            echo "  todo done <sequence>"
+            exit 1
+        fi
+        cmd_add "$1"
+        ;;
+esac
