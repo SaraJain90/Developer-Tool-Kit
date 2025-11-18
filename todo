@@ -45,13 +45,24 @@ cmd_add() {
 cmd_display() {
     ensure_initialized
 
-    printf "%-10s %-50s %-10s\n" "SEQ" "TASK" "STATUS"
-    printf "%-10s %-50s %-10s\n" "----------" "--------------------------------------------------" "----------"
+    if [[ ! -s "$TODO_FILE" ]]; then
+        zenity --info --text="Your todo list is empty!" --title="Todo List"
+        exit 0
+    fi
 
+    list_data=()
     while IFS='|' read -r seq msg status; do
-        printf "%-10s %-50s %-10s\n" "$seq" "$msg" "$status"
+        list_data+=("$seq" "$msg" "$status")
     done < "$TODO_FILE"
+
+    zenity --list \
+        --title="Todo List" \
+        --column="SEQ" \
+        --column="TASK" \
+        --column="STATUS" \
+        "${list_data[@]}"
 }
+
 
 
 cmd_done() {

@@ -5,6 +5,11 @@
 git clone https://github.com/SaraJain90/Developer-Tool-Kit.git
 cd Developer-Tool-Kit
 ```
+## INSTALL ZENITY
+```bash
+sudo apt install zenity
+```
+
 
 ## ADD to path
 ### ZSH
