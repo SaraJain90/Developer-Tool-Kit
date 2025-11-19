@@ -25,10 +25,10 @@ if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   echo -e "${RED}⚠ Not a git repository in ${MAGENTA}$(pwd)${NC}"
 fi
 
-echo -e "${CYAN}→ Adding files...${NC}"
+echo -e "${MAGENTA}→ Adding files...${NC}"
 git add .
 
-echo -e "${CYAN}→ Committing...${NC}"
+echo -e "${MAGENTA}→ Committing...${NC}"
 
 # BUG FIX #2
 if git commit -m "$msg"; then
