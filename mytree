@@ -2,14 +2,18 @@
 
 DIR="$(pwd)"
 
+# Colors
 BLUE="\e[34m"
 CYAN="\e[36m"
 YELLOW="\e[33m"
 GREEN="\e[32m"
+MAGENTA="\e[35m"
 BOLD="\e[1m"
 RESET="\e[0m"
 
-echo -e "${BOLD}${GREEN}📁 $(basename "$DIR")${RESET}"
+# Highlight Root Directory
+ROOT_NAME="$(basename "$DIR")"
+echo -e "${BOLD}${GREEN}📁 $ROOT_NAME  ${MAGENTA}(You are here)${RESET}"
 
 print_tree() {
     local path="$1"
@@ -30,9 +34,12 @@ print_tree() {
             new_prefix="$prefix│   "
         fi
 
+        # Subdirectories
         if [[ -d "$entry" ]]; then
             echo -e "${prefix}${branch} ${BLUE}📁 ${BOLD}$(basename "$entry")${RESET}"
             print_tree "$entry" "$new_prefix"
+
+        # Files
         elif [[ -f "$entry" ]]; then
             echo -e "${prefix}${branch} ${CYAN}📄 $(basename "$entry")${RESET}"
         fi
