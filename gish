@@ -1,0 +1,48 @@
+#!/bin/bash
+set -euo pipefail
+
+# One Half Dark Color Scheme
+NC="\033[0m"
+RED="\033[38;5;203m"       # Salmon Red
+GREEN="\033[38;5;114m"     # Mint Green
+YELLOW="\033[38;5;180m"    # Soft Yellow
+BLUE="\033[38;5;75m"       # Clean Blue
+MAGENTA="\033[38;5;139m"   # Lavender Purple
+CYAN="\033[38;5;73m"       # Deep Cyan
+WHITE="\033[38;5;255m"     # Light Gray
+
+echo -e "${BLUE}Please enter a message for the commit (leave empty for 'Auto commit'):${NC}"
+read -rp "> " msg
+
+# BUG FIX #1
+if [ -z "${msg:-}" ]; then
+    msg="Auto commit"
+    echo -e "${YELLOW}Using default commit message:${NC} ${CYAN}\"$msg\"${NC}"
+fi
+
+# Git repo check (your original logic)
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo -e "${RED}⚠ Not a git repository in ${MAGENTA}$(pwd)${NC}"
+fi
+
+echo -e "${CYAN}→ Adding files...${NC}"
+git add .
+
+echo -e "${CYAN}→ Committing...${NC}"
+
+# BUG FIX #2
+if git commit -m "$msg"; then
+    echo -e "${GREEN}✅ Commit successful: \"$msg\"${NC}"
+else
+    echo -e "${RED}❌ Commit failed.${NC}"
+    exit 1
+fi
+
+echo -e "${CYAN}→ Pushing...${NC}"
+if git push; then
+    echo -e "${GREEN}✅ Push successful.${NC}"
+else
+    echo -e "${RED}❌ Push failed.${NC}"
+    echo -e "${YELLOW}You may need:${NC} git push --set-upstream origin <branch>"
+    exit 1
+fi
