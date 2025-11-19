@@ -8,14 +8,12 @@
 TODO_DIR=".todo"
 TODO_FILE="$TODO_DIR/todo.db"
 
-
 ensure_initialized() {
     if [[ ! -d "$TODO_DIR" ]]; then
         echo "Error: Todo is not initialized. Run: todo init"
         exit 1
     fi
 }
-
 
 cmd_init() {
     if [[ -d "$TODO_DIR" ]]; then
@@ -29,7 +27,6 @@ cmd_init() {
     echo "Initialized .todo directory"
 }
 
-
 cmd_add() {
     ensure_initialized
 
@@ -41,7 +38,6 @@ cmd_add() {
     echo "Added task #$seq"
 }
 
-
 cmd_display() {
     ensure_initialized
 
@@ -51,9 +47,18 @@ cmd_display() {
     fi
 
     list_data=()
+
+    # Read only non-empty lines, skip blank ones
     while IFS='|' read -r seq msg status; do
+        [[ -z "$seq" ]] && continue
         list_data+=("$seq" "$msg" "$status")
-    done < "$TODO_FILE"
+    done < <(grep . "$TODO_FILE")
+
+    # If array empty after filtering
+    if [[ ${#list_data[@]} -eq 0 ]]; then
+        zenity --info --text="Your todo list is empty!" --title="Todo List"
+        exit 0
+    fi
 
     zenity --list \
         --title="Todo List" \
@@ -62,8 +67,6 @@ cmd_display() {
         --column="STATUS" \
         "${list_data[@]}"
 }
-
-
 
 cmd_done() {
     ensure_initialized
@@ -74,7 +77,6 @@ cmd_done() {
         echo "No todo found with sequence: $seq"
         exit 1
     fi
-
 
     awk -F"|" -v target="$seq" 'BEGIN{OFS=FS} {
         if ($1 == target) $3="done";
