@@ -81,3 +81,4 @@ source ~/.zshrc
 echo 'export GEMINI_API_KEY="API"' >> ~/.bashrc
 source ~/.bashrc
 ```
+//for testing
