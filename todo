@@ -1,9 +1,4 @@
 #!/bin/bash
-# =========================================
-#  Script Name : todo.sh
-#  Description : Simple To-Do List Manager
-#  Author      : Mukul Aggarwal
-# =========================================
 
 TODO_DIR=".todo"
 TODO_FILE="$TODO_DIR/todo.db"
